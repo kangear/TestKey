@@ -1,13 +1,18 @@
 package com.example.testkey;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
+	private final static String LOG_TAG = "com.example.testkey";
 	TextView tv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -15,11 +20,40 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		tv = (TextView)findViewById(R.id.textView);
-		
-		printToast("开始测试按键！");
-	
-	}
+		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+		// Power
+		registerReceiver(mBatInfoReceiver, filter);
+		// Home
+		final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+		registerReceiver(homePressReceiver, homeFilter);
 
+		printToast("开始测试按键！");
+	}
+	
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		// 解除注册 Power
+		if (mBatInfoReceiver != null) {
+			try {
+				unregisterReceiver(mBatInfoReceiver);
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "unregisterReceiver mBatInfoReceiver failure :"
+						+ e.getCause());
+			}
+		};
+		// 解除注册 Home
+		if (homePressReceiver != null) {
+			try {
+				unregisterReceiver(homePressReceiver);
+			} catch (Exception e) {
+				Log.e(LOG_TAG,"unregisterReceiver homePressReceiver failure :"
+								+ e.getCause());
+			}
+		};
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -38,7 +72,12 @@ public class MainActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {   
 	    switch (keyCode) {
 	    
-	    	case KeyEvent.KEYCODE_RIGHT_BRACKET :
+    		case KeyEvent.KEYCODE_POWER :
+	    		//监控/拦截/屏蔽电源键 这里拦截不了
+	    		printToast("get Key KEYCODE_POWER(KeyCode:"+keyCode+")");
+	    		break;	    	
+    		
+    		case KeyEvent.KEYCODE_RIGHT_BRACKET :
 	    		//监控/拦截/屏蔽返回键
 	    		printToast("get Key KEYCODE_RIGHT_BRACKET");
 	    		break;
@@ -49,7 +88,7 @@ public class MainActivity extends Activity {
 	    		break;
 	    		
 	    	case KeyEvent.KEYCODE_HOME:
-	    		//由于Home键为系统键，此处不能捕获，需要重写onAttachedToWindow()
+	    		//由于Home键为系统键，此处不能捕获
 	    		printToast("get Key KEYCODE_HOME");
 	    		break;
 	    		
@@ -86,24 +125,24 @@ public class MainActivity extends Activity {
 	    		
 	    	case KeyEvent.KEYCODE_VOLUME_DOWN:
 	    		//监控/拦截/屏蔽下方向键
-	    		printToast("get Key KEYCODE_VOLUME_DOWN");
+	    		printToast("get Key KEYCODE_VOLUME_DOWN(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case KeyEvent.KEYCODE_VOLUME_UP:
 	    		//监控/拦截/屏蔽中方向键
-	    		printToast("get Key KEYCODE_VOLUME_UP");
+	    		printToast("get Key KEYCODE_VOLUME_UP(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case 220:
 	    	//case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
 	    		//监控/拦截/屏蔽下方向键
-	    		printToast("get Key KEYCODE_BRIGHTNESS_DOWN");
+	    		printToast("get Key KEYCODE_BRIGHTNESS_DOWN(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case 221:	
 	    	//case KeyEvent.KEYCODE_BRIGHTNESS_UP:
 	    		//监控/拦截/屏蔽中方向键
-	    		printToast("get Key KEYCODE_BRIGHTNESS_UP");
+	    		printToast("get Key KEYCODE_BRIGHTNESS_UP(KeyCode:"+keyCode+")");
 	    		break; 				
 	    		
 	    	default :
@@ -120,4 +159,36 @@ public class MainActivity extends Activity {
 		tv.setText(str);	
 	}
 
+	private final BroadcastReceiver homePressReceiver = new BroadcastReceiver() {
+		final String SYSTEM_DIALOG_REASON_KEY = "reason";
+		final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
+				String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
+				if (reason != null
+						&& reason.equals(SYSTEM_DIALOG_REASON_HOME_KEY)) {
+					// 自己随意控制程序，关闭...
+				}
+			}
+		}
+
+	};
+	private final BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+
+			final String action = intent.getAction();
+			if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+				
+				printToast("get Key KEYCODE_POWER(KeyCode:26)");;
+				// 退出程序...
+			}
+		}
+	};
+
 }
+
