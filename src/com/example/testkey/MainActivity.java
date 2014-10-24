@@ -5,15 +5,30 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
     private final static String LOG_TAG = "com.example.testkey";
     TextView tv;
+    private MediaPlayer mMediaPlayer = null;
+    private CheckBox mCheckBox = null;
+    private int state = IDLE;  
+    private static final int PLAYING = 0;  
+    private static final int PAUSE = 1;  
+    private static final int STOP = 2;  
+    private static final int IDLE = 3;  
+    public static final int UPDATE = 2; 
+    private boolean mIsChecked = false;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,12 +43,24 @@ public class MainActivity extends Activity {
         registerReceiver(homePressReceiver, homeFilter);
 
         printToast("开始测试按键！");
+
+        mMediaPlayer = new MediaPlayer();
+        mCheckBox = (CheckBox) this.findViewById(R.id.is_test_bt_checkbox);
+        mCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                    boolean isChecked) {
+                mIsChecked = isChecked;
+                update();
+            }
+        });
     }
+    
+    
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
+
         // 解除注册 Power
         if (mBatInfoReceiver != null) {
             try {
@@ -52,6 +79,13 @@ public class MainActivity extends Activity {
                                 + e.getCause());
             }
         };
+     
+        // release mediaplayer
+        stop();
+        mMediaPlayer.release();
+        mMediaPlayer = null;
+
+        super.onDestroy();
     }
 
     @Override
@@ -211,4 +245,66 @@ public class MainActivity extends Activity {
         }
     };
 
+    @Override
+    protected void onResume() {
+        update();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        stop();
+        super.onPause();
+    }
+    
+    private void update() {
+        if(mIsChecked)
+            start();
+    }
+    
+    private void pause() {  
+        if (mMediaPlayer.isPlaying()) {  
+            mMediaPlayer.pause();  
+            state = PAUSE;  
+        }  
+    }  
+  
+    private void start() {  
+        if (state == STOP) {  
+            play();  
+        } else if (state == PAUSE) {  
+            mMediaPlayer.start();  
+            state = PLAYING;  
+        }  
+    }  
+  
+    private void stop() {  
+        mMediaPlayer.stop();  
+        state = STOP;  
+    }  
+  
+    // MediaPlayer进入prepared状态开始播放  
+    private OnPreparedListener preListener = new OnPreparedListener() {  
+        public void onPrepared(MediaPlayer arg0) {  
+            mMediaPlayer.start();  
+            state = PLAYING;  
+        }  
+  
+    };  
+  
+    private void play() {  
+        try {  
+            if (mMediaPlayer == null || state == STOP) {  
+                // 创建MediaPlayer对象并设置Listener  
+                mMediaPlayer = MediaPlayer.create(this, R.raw.lapple);  //silence10sec
+                mMediaPlayer.setOnPreparedListener(preListener);
+                mMediaPlayer.setLooping(true);
+            } else {  
+                // 复用MediaPlayer对象  
+                mMediaPlayer.reset();  
+            }  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+    }  
 }
