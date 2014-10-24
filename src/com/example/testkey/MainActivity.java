@@ -21,14 +21,14 @@ public class MainActivity extends Activity {
     TextView tv;
     private MediaPlayer mMediaPlayer = null;
     private CheckBox mCheckBox = null;
-    private int state = IDLE;  
-    private static final int PLAYING = 0;  
-    private static final int PAUSE = 1;  
-    private static final int STOP = 2;  
-    private static final int IDLE = 3;  
-    public static final int UPDATE = 2; 
+    private int state = IDLE;
+    private static final int PLAYING = 0;
+    private static final int PAUSE = 1;
+    private static final int STOP = 2;
+    private static final int IDLE = 3;
+    public static final int UPDATE = 2;
     private boolean mIsChecked = false;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +55,8 @@ public class MainActivity extends Activity {
             }
         });
     }
-    
-    
+
+
 
     @Override
     public void onDestroy() {
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
                                 + e.getCause());
             }
         };
-     
+
         // release mediaplayer
         stop();
         mMediaPlayer.release();
@@ -256,55 +256,55 @@ public class MainActivity extends Activity {
         stop();
         super.onPause();
     }
-    
+
     private void update() {
         if(mIsChecked)
             start();
     }
-    
-    private void pause() {  
-        if (mMediaPlayer.isPlaying()) {  
-            mMediaPlayer.pause();  
-            state = PAUSE;  
-        }  
-    }  
-  
-    private void start() {  
-        if (state == STOP) {  
-            play();  
-        } else if (state == PAUSE) {  
-            mMediaPlayer.start();  
-            state = PLAYING;  
-        }  
-    }  
-  
-    private void stop() {  
-        mMediaPlayer.stop();  
-        state = STOP;  
-    }  
-  
-    // MediaPlayer进入prepared状态开始播放  
-    private OnPreparedListener preListener = new OnPreparedListener() {  
-        public void onPrepared(MediaPlayer arg0) {  
-            mMediaPlayer.start();  
-            state = PLAYING;  
-        }  
-  
-    };  
-  
-    private void play() {  
-        try {  
-            if (mMediaPlayer == null || state == STOP) {  
-                // 创建MediaPlayer对象并设置Listener  
+
+    private void pause() {
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+            state = PAUSE;
+        }
+    }
+
+    private void start() {
+        if (state == STOP) {
+            play();
+        } else if (state == PAUSE) {
+            mMediaPlayer.start();
+            state = PLAYING;
+        }
+    }
+
+    private void stop() {
+        mMediaPlayer.stop();
+        state = STOP;
+    }
+
+    // MediaPlayer进入prepared状态开始播放
+    private OnPreparedListener preListener = new OnPreparedListener() {
+        public void onPrepared(MediaPlayer arg0) {
+            mMediaPlayer.start();
+            state = PLAYING;
+        }
+
+    };
+
+    private void play() {
+        try {
+            if (mMediaPlayer == null || state == STOP) {
+                // 创建MediaPlayer对象并设置Listener
                 mMediaPlayer = MediaPlayer.create(this, R.raw.lapple);  //silence10sec
                 mMediaPlayer.setOnPreparedListener(preListener);
                 mMediaPlayer.setLooping(true);
-            } else {  
-                // 复用MediaPlayer对象  
-                mMediaPlayer.reset();  
-            }  
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        }  
-    }  
+            } else {
+                // 复用MediaPlayer对象
+                mMediaPlayer.reset();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
