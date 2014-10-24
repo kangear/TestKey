@@ -124,27 +124,48 @@ public class MainActivity extends Activity {
 	    		
 	    		
 	    	case KeyEvent.KEYCODE_VOLUME_DOWN:
-	    		//监控/拦截/屏蔽下方向键
+                //监控/拦截/屏蔽下方向键
 	    		printToast("get Key KEYCODE_VOLUME_DOWN(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case KeyEvent.KEYCODE_VOLUME_UP:
-	    		//监控/拦截/屏蔽中方向键
+                //监控/拦截/屏蔽中方向键
 	    		printToast("get Key KEYCODE_VOLUME_UP(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case 220:
 	    	//case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
-	    		//监控/拦截/屏蔽下方向键
+                //监控/拦截/屏蔽亮度减键
 	    		printToast("get Key KEYCODE_BRIGHTNESS_DOWN(KeyCode:"+keyCode+")");
 	    		break;
 	    		
 	    	case 221:	
 	    	//case KeyEvent.KEYCODE_BRIGHTNESS_UP:
-	    		//监控/拦截/屏蔽中方向键
+                //监控/拦截/屏蔽亮度加键
 	    		printToast("get Key KEYCODE_BRIGHTNESS_UP(KeyCode:"+keyCode+")");
 	    		break; 				
-	    		
+
+
+	        case KeyEvent.KEYCODE_MEDIA_PLAY:
+                printToast("get Key KEYCODE_MEDIA_PLAY(KeyCode:"+keyCode+")");
+                break;
+
+            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                printToast("get Key KEYCODE_MEDIA_PAUSE(KeyCode:"+keyCode+")");
+                break;
+
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                printToast("get Key KEYCODE_MEDIA_PREVIOUS(KeyCode:"+keyCode+")");
+                break;
+
+            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                printToast("get Key KEYCODE_MEDIA_PLAY_PAUSE(KeyCode:"+keyCode+")");
+                break;
+
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+                printToast("get Key KEYCODE_MEDIA_NEXT(KeyCode:"+keyCode+")");
+                break;
+
 	    	default :
 	    		printToast("keyCode: "+keyCode+" (http://developer.android.com/reference/android/view/KeyEvent.html)");
 	    		break;
