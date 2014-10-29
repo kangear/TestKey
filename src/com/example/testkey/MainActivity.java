@@ -2,9 +2,11 @@ package com.example.testkey;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
@@ -54,6 +56,11 @@ public class MainActivity extends Activity {
                 update();
             }
         });
+
+        // for service
+        ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(new ComponentName(
+                this,
+                MusicIntentReceiver.class));
     }
 
 
@@ -212,6 +219,7 @@ public class MainActivity extends Activity {
 
     public void printToast(String str) {
         tv.setText(str);
+        Log.i(LOG_TAG, str);
     }
 
     private final BroadcastReceiver homePressReceiver = new BroadcastReceiver() {
