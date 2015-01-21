@@ -17,5 +17,5 @@ Android按键测试程序
 
 		VOICE_COMMAND 正常安装后就可以监听到
 		LAST_NUMBER_REDIAL 需要将该APP放置到system/app目录下放可正常监听到
-		比如，当LAST_NUMBER_REDIAL被触发后会出现PHONE应用和TESTKEY挣抢启动。
+		比如，当LAST_NUMBER_REDIAL被触发后会出现PHONE应用和TESTKEY争抢启动。
 ![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-01-21-152934.png "github") 
