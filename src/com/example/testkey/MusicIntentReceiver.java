@@ -30,6 +30,7 @@ import android.widget.Toast;
  * declaring it in a &lt;receiver&gt; tag in AndroidManifest.xml.
  */
 public class MusicIntentReceiver extends BroadcastReceiver {
+	private static final String LOG_TAG = "MusicIntentReceiver";
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
@@ -39,7 +40,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
             //context.startService(new Intent(MusicService.ACTION_PAUSE));
 
         } else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
-            Log.i("MusicIntentReceiver", "ACTION_MEDIA_BUTTON!");
+            Log.i(LOG_TAG, "ACTION_MEDIA_BUTTON!");
             KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
             if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
                 return;
@@ -67,6 +68,8 @@ public class MusicIntentReceiver extends BroadcastReceiver {
                     //context.startService(new Intent(MusicService.ACTION_REWIND));
                     break;
             }
+        } else {
+            Log.i(LOG_TAG, "other intent");
         }
     }
 }

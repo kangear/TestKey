@@ -12,7 +12,6 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -35,7 +34,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d(LOG_TAG, "onCreate");
         tv = (TextView)findViewById(R.id.textView);
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         // Power
@@ -61,6 +60,22 @@ public class MainActivity extends Activity {
         ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(new ComponentName(
                 this,
                 MusicIntentReceiver.class));
+
+        // check intent
+        if (getIntent() != null) {
+            String act = getIntent().getAction();
+            if(act != null) {
+                if(act.equals(Intent.ACTION_VOICE_COMMAND)) {
+                    // voice command
+                    Log.d(LOG_TAG, "VOICE_COMMAND");
+                    printToast("get Key VOICE_COMMAND");
+                } else if (act.equals("android.intent.action.CALL_PRIVILEGED")) {
+                    // last number redials command
+                    Log.d(LOG_TAG, "ACTION_CALL_PRIVILEGED");
+                    printToast("get Key LAST_NUMBER_REDIAL");
+                }
+            }
+        }
     }
 
 
@@ -93,20 +108,6 @@ public class MainActivity extends Activity {
         mMediaPlayer = null;
 
         super.onDestroy();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    protected void onUserLeaveHint() {
-            //super.onUserLeaveHint();
-            System.out.println("onUserLeaveHint");
-
     }
 
     @Override
@@ -256,11 +257,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         update();
+        Log.d(LOG_TAG, "onResume");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
+        pause();
         stop();
         super.onPause();
     }
