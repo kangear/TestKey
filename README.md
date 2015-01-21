@@ -19,5 +19,6 @@ Android按键测试程序
 		LAST_NUMBER_REDIAL 需要将该APP放置到system/app目录下放可正常监听到
 		比如，当LAST_NUMBER_REDIAL被触发后会出现PHONE应用和TESTKEY争抢启动。
 ![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-01-21-152934.png "github") 
-监听到 末位重拨
+
+监听到 末位重拨 按键：
 ![github](https://github.com/kangear/TestKey/blob/master/apk/last_number_redail.png "github") 
