@@ -14,4 +14,5 @@ Android按键测试程序
 #说明：
 		VOICE_COMMAND 正常安装后就可以监听到
 		LAST_NUMBER_REDIAL 需要将该APP放置到system/app目录下放可正常监听到
-		比如：![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-01-21-152934.png "github") 
+		比如：
+![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-01-21-152934.png "github") 
