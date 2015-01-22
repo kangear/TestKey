@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
                     // voice command
                     Log.d(LOG_TAG, "VOICE_COMMAND");
                     printToast("get Key VOICE_COMMAND");
-                } else if (act.equals("android.intent.action.CALL_PRIVILEGED")) {
+                } else if (act.equals("android.intent.action.CALL_PRIVILEGED") || act.equals("android.intent.action.KANGEAR_LASTREDIAL_TO_VR")) {
                     // last number redials command
                     Log.d(LOG_TAG, "ACTION_CALL_PRIVILEGED");
                     printToast("get Key LAST_NUMBER_REDIAL");
