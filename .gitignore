@@ -1,6 +1,7 @@
 # Built application files
 *.apk
 !TestKey.apk
+!Bluetooth.apk
 *.ap_
 
 # Files for the Dalvik VM
