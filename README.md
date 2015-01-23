@@ -36,11 +36,12 @@ apk/目录下TestKey.apk/Bluetooth.apk是最新的。
 如果实验正常，那么下一步就是转向到「语音拨号」。
 
 ###20150123更 重定向
-
-不再监听VOICE_COMMAND且将LAST_NUMBER_REDIAL重定向到VOICE_COMMAND
+1.不再监听VOICE_COMMAND且将LAST_NUMBER_REDIAL重定向到VOICE_COMMAND
 
 只更新了TestKey.apk只重新安装它就好。
 
 另：如果你的手机支持VOICE_COMMAND(语音拨号)时直接从睡眠(黑屏)中唤醒，那么就能唤醒。
 
 TestKey.apk目前只启动重定向的功能。
+
+2.重定向后自行关闭
