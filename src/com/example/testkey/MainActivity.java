@@ -73,6 +73,9 @@ public class MainActivity extends Activity {
                     // last number redials command
                     Log.d(LOG_TAG, "ACTION_CALL_PRIVILEGED");
                     printToast("get Key LAST_NUMBER_REDIAL");
+                    Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
             }
         }
