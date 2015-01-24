@@ -1,6 +1,9 @@
 package com.example.testkey;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,17 +12,20 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
+@SuppressLint("InlinedApi")
 public class MainActivity extends Activity {
     private final static String LOG_TAG = "com.example.testkey";
-    TextView tv;
+    TextView mTextView;
     private MediaPlayer mMediaPlayer = null;
     private CheckBox mCheckBox = null;
     private int state = IDLE;
@@ -29,14 +35,20 @@ public class MainActivity extends Activity {
     private static final int IDLE = 3;
     public static final int UPDATE = 2;
     private boolean mIsChecked = false;
+    private static int IS_NEED_REDIRECT = 0;
+    private static final int BIT_BT_CONNECTED = (1 << 0);
+    private static final int BIT_SCREEN_OFF = (1 << 1);
+    private static final int NEED_REDIRECT = BIT_BT_CONNECTED | BIT_SCREEN_OFF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG, "onCreate");
-        tv = (TextView)findViewById(R.id.textView);
+        mTextView = (TextView)findViewById(R.id.textView);
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
         // Power
         registerReceiver(mBatInfoReceiver, filter);
         // Home
@@ -64,12 +76,13 @@ public class MainActivity extends Activity {
         // check intent
         if (getIntent() != null) {
             String act = getIntent().getAction();
-            if(act != null) {
-                if(act.equals(Intent.ACTION_VOICE_COMMAND)) {
+            if (act != null) {
+                if (act.equals(Intent.ACTION_VOICE_COMMAND)) {
                     // voice command
                     Log.d(LOG_TAG, "VOICE_COMMAND");
                     printToast("get Key VOICE_COMMAND");
-                } else if (act.equals("android.intent.action.CALL_PRIVILEGED") || act.equals("android.intent.action.KANGEAR_LASTREDIAL_TO_VR")) {
+                } else if (act.equals("android.intent.action.CALL_PRIVILEGED")
+                        || act.equals("android.intent.action.KANGEAR_LASTREDIAL_TO_VR")) {
                     // last number redials command
                     Log.d(LOG_TAG, "ACTION_CALL_PRIVILEGED");
                     printToast("get Key LAST_NUMBER_REDIAL");
@@ -83,7 +96,14 @@ public class MainActivity extends Activity {
         }
     }
 
-
+    public void onClick(View v) {
+        switch(v.getId()) {
+        case R.id.button1:
+            Uri uri = Uri.parse("tel:15800001234");
+            Intent intent = new Intent(Intent.ACTION_CALL, uri);
+            startActivity(intent);
+        }
+    }
 
     @Override
     public void onDestroy() {
@@ -224,7 +244,7 @@ public class MainActivity extends Activity {
     }
 
     public void printToast(String str) {
-        tv.setText(str);
+        mTextView.setText(str);
         Log.i(LOG_TAG, str);
     }
 
@@ -246,15 +266,28 @@ public class MainActivity extends Activity {
 
     };
     private final BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
-
         @Override
         public void onReceive(final Context context, final Intent intent) {
 
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-
-                printToast("get Key KEYCODE_POWER(KeyCode:26)");;
-                // 退出程序...
+                IS_NEED_REDIRECT |= BIT_SCREEN_OFF;
+                printToast("get Key KEYCODE_POWER(KeyCode:26)-HEI:" + IS_NEED_REDIRECT);
+            } else if(Intent.ACTION_SCREEN_ON.equals(action)){
+                IS_NEED_REDIRECT &= ~BIT_SCREEN_OFF;
+                printToast("get Key KEYCODE_POWER(KeyCode:26)-BAI:" + IS_NEED_REDIRECT);
+            } else if(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED.equals(action)) {
+                //IS_NEED_REDIRECT &= ~BIT_SCREEN_OFF;
+            } else if(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
+                        0);
+                if (state == BluetoothHeadset.STATE_CONNECTED) {
+                    Log.i(LOG_TAG, "STATE_CONNECTED");
+                    IS_NEED_REDIRECT |= BIT_BT_CONNECTED;
+                } else if (state == BluetoothHeadset.STATE_DISCONNECTING) {
+                    Log.i(LOG_TAG, "STATE_CONNECTED");
+                    IS_NEED_REDIRECT &= ~BIT_BT_CONNECTED;
+                }
             }
         }
     };
