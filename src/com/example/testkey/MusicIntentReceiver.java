@@ -16,6 +16,7 @@
 
 package com.example.testkey;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,18 @@ public class MusicIntentReceiver extends BroadcastReceiver {
                     // previous song
                     //context.startService(new Intent(MusicService.ACTION_REWIND));
                     break;
+            }
+        } else if (intent.getAction().equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
+        	Log.i(LOG_TAG, "BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED");
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE,
+                    0);
+            if (state == BluetoothAdapter.STATE_CONNECTED) {
+                Log.i(LOG_TAG, "STATE_CONNECTED");
+            } else if (state == BluetoothAdapter.STATE_DISCONNECTING ||
+            		   state == BluetoothAdapter.STATE_DISCONNECTED) {
+                Log.i(LOG_TAG, "STATE_DISCONNECTING");
+            } else {
+            	Log.e(LOG_TAG, "STATE_UNKOWN:" + state);
             }
         } else {
             Log.i(LOG_TAG, "other intent");

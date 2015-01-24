@@ -3,20 +3,24 @@ package com.example.testkey;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -25,6 +29,7 @@ import android.widget.TextView;
 @SuppressLint("InlinedApi")
 public class MainActivity extends Activity {
     private final static String LOG_TAG = "com.example.testkey";
+    Context mContext;
     TextView mTextView;
     private MediaPlayer mMediaPlayer = null;
     private CheckBox mCheckBox = null;
@@ -35,17 +40,15 @@ public class MainActivity extends Activity {
     private static final int IDLE = 3;
     public static final int UPDATE = 2;
     private boolean mIsChecked = false;
-    private static int IS_NEED_REDIRECT = 0;
-    private static final int BIT_BT_CONNECTED = (1 << 0);
-    private static final int BIT_SCREEN_OFF = (1 << 1);
-    private static final int NEED_REDIRECT = BIT_BT_CONNECTED | BIT_SCREEN_OFF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG, "onCreate");
+        mContext = this;
         mTextView = (TextView)findViewById(R.id.textView);
+
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
@@ -74,7 +77,8 @@ public class MainActivity extends Activity {
                 MusicIntentReceiver.class));
 
         // check intent
-        if (getIntent() != null) {
+        Intent intent = getIntent();
+        if (intent != null) {
             String act = getIntent().getAction();
             if (act != null) {
                 if (act.equals(Intent.ACTION_VOICE_COMMAND)) {
@@ -83,29 +87,57 @@ public class MainActivity extends Activity {
                     printToast("get Key VOICE_COMMAND");
                 } else if (act.equals("android.intent.action.CALL_PRIVILEGED")
                         || act.equals("android.intent.action.KANGEAR_LASTREDIAL_TO_VR")) {
-                    // last number redials command
-                    Log.d(LOG_TAG, "ACTION_CALL_PRIVILEGED");
-                    printToast("get Key LAST_NUMBER_REDIAL");
-                    if(IS_NEED_REDIRECT == NEED_REDIRECT) {
-                        Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        // for end user
-                        finish();
+                    printToast("LAST_NUMBER_REDIAL(需要重定向:" + KeyService.isNeedRedirect(this) +")");
+                    dail(intent);
+                    if(KeyService.isNeedRedirect(this)) {
+                    	startVoiceDial();
+                    	displayMyself(mContext);
                     } else {
-                        printToast("get Key LAST_NUMBER_REDIAL(I will do nothing!)");
+                        printToast("DIAL_CUSTOM_NUMBER");
+                        intent.getExtras();
                     }
                 }
             }
         }
     }
+  
+    private void displayMyself(Context context) {
+    	Window window=((Activity) context).getWindow();
+    	WindowManager.LayoutParams wl = window.getAttributes();
+    	wl.alpha=0.0f;
+    	window.setAttributes(wl);
+    	((Activity) context).finish();
+    }
+    
+    private void startVoiceDial() {
+        Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
+    private void dail(Intent intent) {
+    	Intent intent2 = new Intent(Intent.ACTION_CALL);
+    	String number = PhoneNumberUtils.getNumberFromIntent(intent, this);
+        // Check the number, don't convert for sip uri
+        // TODO put uriNumber under PhoneNumberUtils
+        if (number != null) {
+//            if (!PhoneNumberUtils.isUriNumber(number)) {
+//                number = PhoneNumberUtils.convertKeypadLettersToDigits(number);
+//                number = PhoneNumberUtils.stripSeparators(number);
+//            }
+        } else {
+            Log.w(LOG_TAG, "The number obtained from Intent is null.");
+        }
+        if (number != null) {
+        	intent2.putExtra(Intent.EXTRA_PHONE_NUMBER, number);
+        }
+    	startActivity(intent2);
+    }
+    
     public void onClick(View v) {
         switch(v.getId()) {
         case R.id.button1:
-            Uri uri = Uri.parse("tel:10086");
-            Intent intent = new Intent(Intent.ACTION_CALL, uri);
-            startActivity(intent);
+        	displayMyself(mContext);
         }
     }
 
@@ -141,108 +173,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-
-            case KeyEvent.KEYCODE_POWER :
-                //监控/拦截/屏蔽电源键 这里拦截不了
-                printToast("get Key KEYCODE_POWER(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_RIGHT_BRACKET :
-                //监控/拦截/屏蔽返回键
-                printToast("get Key KEYCODE_RIGHT_BRACKET");
-                break;
-
-            case KeyEvent.KEYCODE_MENU :
-                //监控/拦截菜单键
-                printToast("get Key KEYCODE_MENU");
-                break;
-
-            case KeyEvent.KEYCODE_HOME:
-                //由于Home键为系统键，此处不能捕获
-                printToast("get Key KEYCODE_HOME");
-                break;
-
-            case KeyEvent.KEYCODE_DPAD_UP:
-                //监控/拦截/屏蔽上方向键
-                printToast("get Key KEYCODE_DPAD_UP");
-                break;
-
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                //监控/拦截/屏蔽左方向键
-                printToast("get Key KEYCODE_DPAD_LEFT");
-                break;
-
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                //监控/拦截/屏蔽右方向键
-                printToast("get Key KEYCODE_DPAD_RIGHT");
-                break;
-
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                //监控/拦截/屏蔽下方向键
-                printToast("get Key KEYCODE_DPAD_DOWN");
-                break;
-
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-                //监控/拦截/屏蔽中方向键
-                printToast("get Key KEYCODE_DPAD_CENTER");
-                break;
-
-            case KeyEvent.FLAG_KEEP_TOUCH_MODE:
-                //监控/拦截/屏蔽长按
-                printToast("get Key FLAG_KEEP_TOUCH_MODE");
-                break;
-
-
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                //监控/拦截/屏蔽下方向键
-                printToast("get Key KEYCODE_VOLUME_DOWN(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                //监控/拦截/屏蔽中方向键
-                printToast("get Key KEYCODE_VOLUME_UP(KeyCode:"+keyCode+")");
-                break;
-
-            case 220:
-            //case KeyEvent.KEYCODE_BRIGHTNESS_DOWN:
-                //监控/拦截/屏蔽亮度减键
-                printToast("get Key KEYCODE_BRIGHTNESS_DOWN(KeyCode:"+keyCode+")");
-                break;
-
-            case 221:
-            //case KeyEvent.KEYCODE_BRIGHTNESS_UP:
-                //监控/拦截/屏蔽亮度加键
-                printToast("get Key KEYCODE_BRIGHTNESS_UP(KeyCode:"+keyCode+")");
-                break;
-
-
-            case KeyEvent.KEYCODE_MEDIA_PLAY:
-                printToast("get Key KEYCODE_MEDIA_PLAY(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                printToast("get Key KEYCODE_MEDIA_PAUSE(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                printToast("get Key KEYCODE_MEDIA_PREVIOUS(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                printToast("get Key KEYCODE_MEDIA_PLAY_PAUSE(KeyCode:"+keyCode+")");
-                break;
-
-            case KeyEvent.KEYCODE_MEDIA_NEXT:
-                printToast("get Key KEYCODE_MEDIA_NEXT(KeyCode:"+keyCode+")");
-                break;
-
-            default :
-                printToast("keyCode: "+keyCode+" (http://developer.android.com/reference/android/view/KeyEvent.html)");
-                break;
-
-        }
-
+    	printToast(KeyService.parseKeyCode(keyCode));
         return true;
         //return super.onKeyDown(keyCode, event);
     }
@@ -275,23 +206,9 @@ public class MainActivity extends Activity {
 
             final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                IS_NEED_REDIRECT |= BIT_SCREEN_OFF;
-                printToast("get Key KEYCODE_POWER(KeyCode:26)-HEI:" + IS_NEED_REDIRECT);
+                printToast("get Key KEYCODE_POWER(KeyCode:26)-OFF");
             } else if(Intent.ACTION_SCREEN_ON.equals(action)){
-                IS_NEED_REDIRECT &= ~BIT_SCREEN_OFF;
-                printToast("get Key KEYCODE_POWER(KeyCode:26)-BAI:" + IS_NEED_REDIRECT);
-            } else if(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED.equals(action)) {
-                //IS_NEED_REDIRECT &= ~BIT_SCREEN_OFF;
-            } else if(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(action)) {
-                int state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE,
-                        0);
-                if (state == BluetoothHeadset.STATE_CONNECTED) {
-                    Log.i(LOG_TAG, "STATE_CONNECTED");
-                    IS_NEED_REDIRECT |= BIT_BT_CONNECTED;
-                } else if (state == BluetoothHeadset.STATE_DISCONNECTING) {
-                    Log.i(LOG_TAG, "STATE_CONNECTED");
-                    IS_NEED_REDIRECT &= ~BIT_BT_CONNECTED;
-                }
+                printToast("get Key KEYCODE_POWER(KeyCode:26)-NO");
             }
         }
     };
