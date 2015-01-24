@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		Log.d(LOG_TAG, "onCreate");
 		mContext = this;
+		displayMyself(mContext);
 		mTextView = (TextView)findViewById(R.id.textView);
 
 		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
@@ -88,31 +89,46 @@ public class MainActivity extends Activity {
 				} else if (act.equals("android.intent.action.CALL_PRIVILEGED")
 						|| act.equals("android.intent.action.KANGEAR_LASTREDIAL_TO_VR")) {
 					printToast("LAST_NUMBER_REDIAL(需要重定向:" + KeyService.isNeedRedirect(this) +")");
-					dail(intent);
 					if(KeyService.isNeedRedirect(this)) {
 						startVoiceDial();
 						displayMyself(mContext);
+						finish();
 					} else {
 						printToast("DIAL_CUSTOM_NUMBER");
-						intent.getExtras();
+						dail(intent);
+						displayMyself(mContext);
+						finish();
 					}
+				} else {
+					showMyself(mContext);
 				}
 			}
 		}
 	}
-  
+
+	private void showMyself(Context context) {
+		Window window=((Activity) context).getWindow();
+		WindowManager.LayoutParams wl = window.getAttributes();
+		wl.alpha=1.0f;
+		window.setAttributes(wl);
+	}
+	
 	private void displayMyself(Context context) {
 		Window window=((Activity) context).getWindow();
 		WindowManager.LayoutParams wl = window.getAttributes();
 		wl.alpha=0.0f;
 		window.setAttributes(wl);
-		((Activity) context).finish();
 	}
 	
 	private void startVoiceDial() {
 		Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
+		// Verify that the intent will resolve to an activity  
+		if (intent.resolveActivity(getPackageManager()) != null) {  
+		    startActivity(intent);  
+		} else {
+			Log.e(LOG_TAG, "没有发现语音拨号器！");
+		}
 	}
 
 	private void dail(Intent intent) {
@@ -131,7 +147,12 @@ public class MainActivity extends Activity {
 		if (number != null) {
 			intent2.putExtra(Intent.EXTRA_PHONE_NUMBER, number);
 		}
-		startActivity(intent2);
+		// Verify that the intent will resolve to an activity  
+		if (intent2.resolveActivity(getPackageManager()) != null) {  
+		    startActivity(intent2);  
+		} else {
+			Log.e(LOG_TAG, "没有发现拨号器！");
+		}
 	}
 
 	public void onClick(View v) {
