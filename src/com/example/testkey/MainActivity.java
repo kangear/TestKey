@@ -132,24 +132,10 @@ public class MainActivity extends Activity {
 	}
 
 	private void dail(Intent intent) {
-		Intent intent2 = new Intent(Intent.ACTION_CALL);
-		String number = PhoneNumberUtils.getNumberFromIntent(intent, this);
-		// Check the number, don't convert for sip uri
-		// TODO put uriNumber under PhoneNumberUtils
-		if (number != null) {
-//			if (!PhoneNumberUtils.isUriNumber(number)) {
-//				number = PhoneNumberUtils.convertKeypadLettersToDigits(number);
-//				number = PhoneNumberUtils.stripSeparators(number);
-//			}
-		} else {
-			Log.w(LOG_TAG, "The number obtained from Intent is null.");
-		}
-		if (number != null) {
-			intent2.putExtra(Intent.EXTRA_PHONE_NUMBER, number);
-		}
+		Intent intent2 = new Intent(Intent.ACTION_CALL, intent.getData());
 		// Verify that the intent will resolve to an activity  
 		if (intent2.resolveActivity(getPackageManager()) != null) {  
-		    startActivity(intent2);  
+		    startActivity(intent2);
 		} else {
 			Log.e(LOG_TAG, "没有发现拨号器！");
 		}
