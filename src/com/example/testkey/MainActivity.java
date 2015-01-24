@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
     public void onClick(View v) {
         switch(v.getId()) {
         case R.id.button1:
-            Uri uri = Uri.parse("tel:15800001234");
+            Uri uri = Uri.parse("tel:10086");
             Intent intent = new Intent(Intent.ACTION_CALL, uri);
             startActivity(intent);
         }
