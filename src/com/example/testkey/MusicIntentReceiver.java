@@ -34,7 +34,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = "MusicIntentReceiver";
 	private Context mContext;
 	private KeyService mKeyService;
-	private int mDefaultTimeOut;
+	private static int mDefaultTimeOut;
     @Override
     public void onReceive(Context context, Intent intent) {
 		mContext = context;
