@@ -1,4 +1,4 @@
-/*   
+/*
  * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,13 @@ import android.widget.Toast;
  */
 public class MusicIntentReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = "MusicIntentReceiver";
+	private Context mContext;
+	private KeyService mKeyService;
+	private int mDefaultTimeOut;
     @Override
     public void onReceive(Context context, Intent intent) {
+		mContext = context;
+		mKeyService = new KeyService(mContext);
         if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
             Toast.makeText(context, "Headphones disconnected.", Toast.LENGTH_SHORT).show();
 
@@ -75,9 +80,12 @@ public class MusicIntentReceiver extends BroadcastReceiver {
                     0);
             if (state == BluetoothAdapter.STATE_CONNECTED) {
                 Log.i(LOG_TAG, "STATE_CONNECTED");
+                mDefaultTimeOut = mKeyService.getScreenOffTime();
+                mKeyService.setScreenOffTime(10*1000); // 10 secs
             } else if (state == BluetoothAdapter.STATE_DISCONNECTING ||
             		   state == BluetoothAdapter.STATE_DISCONNECTED) {
                 Log.i(LOG_TAG, "STATE_DISCONNECTING");
+                mKeyService.setScreenOffTime(mDefaultTimeOut); // def secs
             } else {
             	Log.e(LOG_TAG, "STATE_UNKOWN:" + state);
             }

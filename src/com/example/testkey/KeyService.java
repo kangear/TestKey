@@ -1,9 +1,11 @@
 package com.example.testkey;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -13,6 +15,13 @@ public class KeyService {
 	private static final int BIT_BT_CONNECTED = (1 << 0);
 	private static final int BIT_SCREEN_OFF = (1 << 1);
 	private static final int NEED_REDIRECT = BIT_BT_CONNECTED | BIT_SCREEN_OFF;
+	private final Context mContext;
+
+	public KeyService(Context context) {
+		this.mContext = context;
+	}
+
+	@SuppressLint("NewApi")
 	public static boolean isNeedRedirect(Context context) {
 		if(context == null) {
 			return false;
@@ -22,21 +31,21 @@ public class KeyService {
 			IS_NEED_REDIRECT |= BIT_SCREEN_OFF;
 		else
 			IS_NEED_REDIRECT &= ~BIT_SCREEN_OFF;
-		
+
 		BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		IS_NEED_REDIRECT |= parseBtState(mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET));
-		
+
 		Log.d(LOG_TAG, "IS_NEED_REDIRECT:" + IS_NEED_REDIRECT);
 		return IS_NEED_REDIRECT == NEED_REDIRECT;
 	}
-	
+
 	public static int parseBtState(int state) {
 		Log.i(LOG_TAG, "state:" + state);
 		int result = 0;
 		switch(state) {
 		case BluetoothAdapter.STATE_CONNECTED:
 			Log.i(LOG_TAG, "STATE_CONNECTED");
-			result |= BIT_BT_CONNECTED;	
+			result |= BIT_BT_CONNECTED;
 			break;
 		case BluetoothAdapter.STATE_DISCONNECTING:
 		case BluetoothAdapter.STATE_DISCONNECTED:
@@ -128,8 +137,33 @@ public class KeyService {
 					+ keyCode
 					+ " (http://developer.android.com/reference/android/view/KeyEvent.html)";
 			break;
-
 		}
 		return ret;
+	}
+
+	/**
+	 * 获得休眠时间 毫秒
+	 */
+	public int getScreenOffTime() {
+		int screenOffTime = 0;
+		try {
+			screenOffTime = Settings.System.getInt(mContext.getContentResolver(),
+					Settings.System.SCREEN_OFF_TIMEOUT);
+		} catch (Exception localException) {
+
+		}
+		return screenOffTime;
+	}
+
+	/**
+	 * 设置休眠时间 毫秒
+	 */
+	public void setScreenOffTime(int paramInt) {
+		try {
+			Settings.System.putInt(mContext.getContentResolver(),
+					Settings.System.SCREEN_OFF_TIMEOUT, paramInt);
+		} catch (Exception localException) {
+			localException.printStackTrace();
+		}
 	}
 }
