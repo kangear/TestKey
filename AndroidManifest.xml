@@ -53,6 +53,7 @@
                 <action android:name="android.intent.action.SCREEN_OFF" />
                 <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED" />
                 <action android:name="android.media.ACTION_SCO_AUDIO_STATE_UPDATED" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN"/>
             </intent-filter>
         </receiver>
     </application>

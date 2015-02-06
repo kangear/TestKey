@@ -34,7 +34,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = "MusicIntentReceiver";
 	private Context mContext;
 	private KeyService mKeyService;
-	private static int mDefaultTimeOut;
+	private static int mDefaultTimeOut = 0;
     @Override
     public void onReceive(Context context, Intent intent) {
 		mContext = context;
@@ -89,6 +89,10 @@ public class MusicIntentReceiver extends BroadcastReceiver {
             } else {
             	Log.e(LOG_TAG, "STATE_UNKOWN:" + state);
             }
+        } else if (intent.getAction().equals(Intent.ACTION_SHUTDOWN)) {
+            Log.i(LOG_TAG, "Intent.ACTION_SHUTDOWN");
+            if(mDefaultTimeOut != 0)
+                mKeyService.setScreenOffTime(mDefaultTimeOut); // def secs
         } else {
             Log.i(LOG_TAG, "other intent");
         }
