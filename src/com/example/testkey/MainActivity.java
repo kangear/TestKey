@@ -8,14 +8,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,12 +28,6 @@ public class MainActivity extends Activity {
 	TextView mTextView;
 	private MediaPlayer mMediaPlayer = null;
 	private CheckBox mCheckBox = null;
-	private int state = IDLE;
-	private static final int PLAYING = 0;
-	private static final int PAUSE = 1;
-	private static final int STOP = 2;
-	private static final int IDLE = 3;
-	public static final int UPDATE = 2;
 	private boolean mIsChecked = false;
 
 	@Override
@@ -68,7 +57,6 @@ public class MainActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				mIsChecked = isChecked;
-				update();
 			}
 		});
 
@@ -112,20 +100,20 @@ public class MainActivity extends Activity {
 		wl.alpha=1.0f;
 		window.setAttributes(wl);
 	}
-	
+
 	private void displayMyself(Context context) {
 		Window window=((Activity) context).getWindow();
 		WindowManager.LayoutParams wl = window.getAttributes();
 		wl.alpha=0.0f;
 		window.setAttributes(wl);
 	}
-	
+
 	private void startVoiceDial() {
 		Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		// Verify that the intent will resolve to an activity  
-		if (intent.resolveActivity(getPackageManager()) != null) {  
-		    startActivity(intent);  
+		// Verify that the intent will resolve to an activity
+		if (intent.resolveActivity(getPackageManager()) != null) {
+		    startActivity(intent);
 		} else {
 			Log.e(LOG_TAG, "没有发现语音拨号器！");
 		}
@@ -133,8 +121,8 @@ public class MainActivity extends Activity {
 
 	private void dail(Intent intent) {
 		Intent intent2 = new Intent(Intent.ACTION_CALL, intent.getData());
-		// Verify that the intent will resolve to an activity  
-		if (intent2.resolveActivity(getPackageManager()) != null) {  
+		// Verify that the intent will resolve to an activity
+		if (intent2.resolveActivity(getPackageManager()) != null) {
 		    startActivity(intent2);
 		} else {
 			Log.e(LOG_TAG, "没有发现拨号器！");
@@ -169,11 +157,6 @@ public class MainActivity extends Activity {
 								+ e.getCause());
 			}
 		};
-
-		// release mediaplayer
-		stop();
-		mMediaPlayer.release();
-		mMediaPlayer = null;
 
 		super.onDestroy();
 	}
@@ -219,69 +202,4 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
-
-	@Override
-	protected void onResume() {
-		update();
-		Log.d(LOG_TAG, "onResume");
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		pause();
-		stop();
-		super.onPause();
-	}
-
-	private void update() {
-		if(mIsChecked)
-			start();
-	}
-
-	private void pause() {
-		if (mMediaPlayer.isPlaying()) {
-			mMediaPlayer.pause();
-			state = PAUSE;
-		}
-	}
-
-	private void start() {
-		if (state == STOP) {
-			play();
-		} else if (state == PAUSE) {
-			mMediaPlayer.start();
-			state = PLAYING;
-		}
-	}
-
-	private void stop() {
-		mMediaPlayer.stop();
-		state = STOP;
-	}
-
-	// MediaPlayer进入prepared状态开始播放
-	private OnPreparedListener preListener = new OnPreparedListener() {
-		public void onPrepared(MediaPlayer arg0) {
-			mMediaPlayer.start();
-			state = PLAYING;
-		}
-
-	};
-
-	private void play() {
-		try {
-			if (mMediaPlayer == null || state == STOP) {
-				// 创建MediaPlayer对象并设置Listener
-				mMediaPlayer = MediaPlayer.create(this, R.raw.lapple);  //silence10sec
-				mMediaPlayer.setOnPreparedListener(preListener);
-				mMediaPlayer.setLooping(true);
-			} else {
-				// 复用MediaPlayer对象
-				mMediaPlayer.reset();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 }
