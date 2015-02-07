@@ -26,7 +26,6 @@ public class MainActivity extends Activity {
 	private final static String LOG_TAG = "com.example.testkey";
 	Context mContext;
 	TextView mTextView;
-	private MediaPlayer mMediaPlayer = null;
 	private CheckBox mCheckBox = null;
 	private boolean mIsChecked = false;
 
@@ -50,7 +49,6 @@ public class MainActivity extends Activity {
 
 		printToast("开始测试按键！");
 
-		mMediaPlayer = new MediaPlayer();
 		mCheckBox = (CheckBox) this.findViewById(R.id.is_test_bt_checkbox);
 		mCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
