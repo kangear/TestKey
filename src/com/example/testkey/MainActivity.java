@@ -1,5 +1,10 @@
 package com.example.testkey;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -15,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -28,10 +34,12 @@ public class MainActivity extends Activity {
 	TextView mTextView;
 	private CheckBox mCheckBox = null;
 	public static boolean mIsEnableDSuspend = false;
-	private final static int[] time = {0, 0, 0};
+	private final static int[] time = {10, 120, 125};
 	private EditText connectTimeEditText;
 	private EditText disconnectTimeEditText;
 	private EditText disableTimeEditText;
+	private String timeFile;
+	private Button mButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +62,10 @@ public class MainActivity extends Activity {
 		connectTimeEditText = (EditText) this.findViewById(R.id.connected_time);
 		disconnectTimeEditText = (EditText) this.findViewById(R.id.disconnected_time);
 		disableTimeEditText = (EditText) this.findViewById(R.id.disable_time);
+		mButton = (Button) this.findViewById(R.id.edit_button);
+		mButton.setText("编辑");
 
+		timeFile = "time.txt";
 		printToast("开始测试按键！");
 
 		mCheckBox = (CheckBox) this.findViewById(R.id.enable_dsuspend_checkbox);
@@ -63,9 +74,6 @@ public class MainActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				mIsEnableDSuspend = isChecked;
-				time[0] = Integer.valueOf(connectTimeEditText.getText().toString());
-				time[1] = Integer.valueOf(disconnectTimeEditText.getText().toString());
-				time[2] = Integer.valueOf(disableTimeEditText.getText().toString());
 				Intent intent = new Intent("android.intent.action.UPDATE_SUSPEND_TIME_BY_HAND");
 				sendBroadcast(intent);
 			}
@@ -103,6 +111,45 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
+
+		String content = getConfig(timeFile);
+		if(content != null) {
+			String ss[] = content.split(" ");
+			if(ss != null && ss.length >= 3) {
+				time[0] = Integer.valueOf(ss[0]);
+				time[1] = Integer.valueOf(ss[1]);
+				time[2] = Integer.valueOf(ss[2]);
+			}
+		}
+		connectTimeEditText.setText(String.valueOf(time[0]));
+		disconnectTimeEditText.setText(String.valueOf(time[1]));
+		disableTimeEditText.setText(String.valueOf(time[2]));
+		setEditTextEnable(false);
+	}
+
+	void updateConfig(String filename, String content) throws IOException {
+		File file = new File(filename);
+		file.delete();
+		FileOutputStream outStream = openFileOutput(filename, Context.MODE_PRIVATE);
+		Log.d("LOG_TAG", "write bytes:" + content.getBytes().length);
+		outStream.write(content.getBytes());
+		outStream.close();
+	}
+
+	String getConfig(String filename) {
+		byte[] byteName = new byte[20];
+		FileInputStream in;
+		String ret = null;
+		try {
+			in = openFileInput(filename);
+			int len = in.read(byteName);
+			in.close();
+			ret = new String(byteName, 0, len, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.d(LOG_TAG, "str:" + ret);
+		return ret;
 	}
 
 	public static boolean isEnableDSuspend() {
@@ -150,7 +197,30 @@ public class MainActivity extends Activity {
 
 	public void onClick(View v) {
 		switch(v.getId()) {
+		case R.id.edit_button:
+			if(mButton.getText().toString().equals("编辑")) {
+				mButton.setText("保存");
+				setEditTextEnable(true);
+			} else {
+				mButton.setText("编辑");
+				setEditTextEnable(false);
+				try {
+					time[0] = Integer.valueOf(connectTimeEditText.getText().toString());
+					time[1] = Integer.valueOf(disconnectTimeEditText.getText().toString());
+					time[2] = Integer.valueOf(disableTimeEditText.getText().toString());
+					updateConfig(timeFile, time[0] + " "
+							+ time[1] + " " + time[2]);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
+	}
+
+	void setEditTextEnable(boolean isEnable) {
+		connectTimeEditText.setEnabled(isEnable);
+		disconnectTimeEditText.setEnabled(isEnable);
+		disableTimeEditText.setEnabled(isEnable);
 	}
 
 	@Override

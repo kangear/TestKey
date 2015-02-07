@@ -100,5 +100,12 @@
             android:text="125"
             android:textSize="@dimen/activity_horizontal_margin" />
     </LinearLayout>
-
+    
+    <Button
+        android:onClick="onClick"
+        android:id="@+id/edit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </Button>
+    
 </LinearLayout>
