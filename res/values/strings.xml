@@ -4,5 +4,9 @@
     <string name="app_name">TestKey</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
+    <string name="suspend_readme">动态休眠设置休眠时间，根据蓝牙连接状态设置合适的休眠时间</string>
+    <string name="suspend_enable">使能动态休眠-单位(秒)</string>
+    <string name="suspend_connected">连接时：</string>
+    <string name="suspend_disconnected">断开时：</string>
+    <string name="suspend_disenable">禁用时：</string>
 </resources>

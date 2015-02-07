@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,8 +17,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.TextView;
 
 @SuppressLint("InlinedApi")
@@ -28,7 +27,11 @@ public class MainActivity extends Activity {
 	Context mContext;
 	TextView mTextView;
 	private CheckBox mCheckBox = null;
-	private boolean mIsChecked = false;
+	public static boolean mIsEnableDSuspend = false;
+	private final static int[] time = {0, 0, 0};
+	private EditText connectTimeEditText;
+	private EditText disconnectTimeEditText;
+	private EditText disableTimeEditText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +51,23 @@ public class MainActivity extends Activity {
 		final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 		registerReceiver(homePressReceiver, homeFilter);
 
+		connectTimeEditText = (EditText) this.findViewById(R.id.connected_time);
+		disconnectTimeEditText = (EditText) this.findViewById(R.id.disconnected_time);
+		disableTimeEditText = (EditText) this.findViewById(R.id.disable_time);
+
 		printToast("开始测试按键！");
 
-		mCheckBox = (CheckBox) this.findViewById(R.id.is_test_bt_checkbox);
+		mCheckBox = (CheckBox) this.findViewById(R.id.enable_dsuspend_checkbox);
 		mCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				mIsChecked = isChecked;
+				mIsEnableDSuspend = isChecked;
+				time[0] = Integer.valueOf(connectTimeEditText.getText().toString());
+				time[1] = Integer.valueOf(disconnectTimeEditText.getText().toString());
+				time[2] = Integer.valueOf(disableTimeEditText.getText().toString());
+				Intent intent = new Intent("android.intent.action.UPDATE_SUSPEND_TIME_BY_HAND");
+				sendBroadcast(intent);
 			}
 		});
 
@@ -91,6 +103,14 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
+	}
+
+	public static boolean isEnableDSuspend() {
+		return mIsEnableDSuspend;
+	}
+
+	public static int[] getTime() {
+		return time;
 	}
 
 	private void showMyself(Context context) {
@@ -130,8 +150,6 @@ public class MainActivity extends Activity {
 
 	public void onClick(View v) {
 		switch(v.getId()) {
-		case R.id.button1:
-			displayMyself(mContext);
 		}
 	}
 

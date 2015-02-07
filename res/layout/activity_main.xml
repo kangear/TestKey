@@ -10,13 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    
     <CheckBox
         android:id="@+id/is_test_bt_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="测试BT按键" />
-    
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -24,11 +23,82 @@
         android:text="@string/hello_world"
         android:textSize="@dimen/activity_horizontal_margin" />
 
-    <Button
-        android:onClick="onClick"
-        android:id="@+id/button1"
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#D3D3D3"
+        android:enabled="false" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="直接拨号测试-10086" />
+        android:text="@string/suspend_readme"
+        android:textSize="@dimen/activity_horizontal_margin" />
+
+    <CheckBox
+        android:id="@+id/enable_dsuspend_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/suspend_enable" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suspend_connected"
+            android:textSize="@dimen/activity_horizontal_margin" />
+
+        <EditText
+            android:id="@+id/connected_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="10"
+            android:textSize="@dimen/activity_horizontal_margin" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suspend_disconnected"
+            android:textSize="@dimen/activity_horizontal_margin" />
+
+        <EditText
+            android:id="@+id/disconnected_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="120"
+            android:textSize="@dimen/activity_horizontal_margin" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suspend_disenable"
+            android:textSize="@dimen/activity_horizontal_margin" />
+
+        <EditText
+            android:id="@+id/disable_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="125"
+            android:textSize="@dimen/activity_horizontal_margin" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -59,3 +59,5 @@ TestKey.apk目前只启动重定向的功能。
 ![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-105356.png "github")
 
 ![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-105501.png "github") 
+
+![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-121646.png "github") 

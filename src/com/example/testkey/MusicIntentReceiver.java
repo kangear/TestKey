@@ -37,7 +37,6 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = "MusicIntentReceiver";
 	private Context mContext;
 	private KeyService mKeyService;
-	private static int mDefaultTimeOut = 0;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -93,35 +92,28 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 
 			if (state == BluetoothAdapter.STATE_CONNECTED
 					|| state == BluetoothAdapter.STATE_DISCONNECTED) {
-				if (mKeyService.isBtConect())
-					mKeyService.setScreenOffTime(10 * 1000); // def secs
-				else
-					mKeyService.setScreenOffTime(120 * 1000); // def secs
+				updateTime();
 			}
-
-//			if (state == BluetoothAdapter.STATE_CONNECTED) {
-//				Log.i(LOG_TAG, "STATE_CONNECTED");
-//				mDefaultTimeOut = mKeyService.getScreenOffTime();
-//				mKeyService.setScreenOffTime(10 * 1000); // 10 secs
-//			} else if (state == BluetoothAdapter.STATE_DISCONNECTING
-//					|| state == BluetoothAdapter.STATE_DISCONNECTED) {
-//				Log.i(LOG_TAG, "STATE_DISCONNECTING");
-//				mKeyService.setScreenOffTime(mDefaultTimeOut); // def secs
-//			} else {
-//				Log.e(LOG_TAG, "STATE_UNKOWN:" + state);
-//			}
-		} else if (intent.getAction().equals(Intent.ACTION_SHUTDOWN)) {
-			Log.i(LOG_TAG, "Intent.ACTION_SHUTDOWN");
-//			if (mDefaultTimeOut != 0)
-//				mKeyService.setScreenOffTime(mDefaultTimeOut); // def secs
 		} else if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
 			Log.i(LOG_TAG, "Intent.ACTION_BOOT_COMPLETED");
-			if(mKeyService.isBtConect())
-				mKeyService.setScreenOffTime(10*1000); // def secs
-			else
-				mKeyService.setScreenOffTime(120*1000); // def secs
+			updateTime();
+		} else if (intent.getAction().equals("android.intent.action.UPDATE_SUSPEND_TIME_BY_HAND")) {
+			Log.i(LOG_TAG, "Intent.UPDATE_SUSPEND_TIME_BY_HAND");
+			updateTime();
 		} else {
 			Log.i(LOG_TAG, "other intent");
+		}
+	}
+
+	void updateTime() {
+		Log.i(LOG_TAG, "updateTime");
+		if(MainActivity.isEnableDSuspend()) {
+			if(mKeyService.isBtConect())
+				mKeyService.setScreenOffTime(MainActivity.getTime()[0]*1000); // def secs
+			else
+				mKeyService.setScreenOffTime(MainActivity.getTime()[1]*1000); // def secs
+		} else {
+			mKeyService.setScreenOffTime(MainActivity.getTime()[2]*1000); // def secs
 		}
 	}
 }
