@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 public class KeyService {
 	private static final String LOG_TAG = "KeyService";
@@ -26,6 +27,7 @@ public class KeyService {
 		if(context == null) {
 			return false;
 		}
+		IS_NEED_REDIRECT = 0;
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 		if(!powerManager.isScreenOn())
 			IS_NEED_REDIRECT |= BIT_SCREEN_OFF;
@@ -37,6 +39,16 @@ public class KeyService {
 
 		Log.d(LOG_TAG, "IS_NEED_REDIRECT:" + IS_NEED_REDIRECT);
 		return IS_NEED_REDIRECT == NEED_REDIRECT;
+	}
+
+	@SuppressLint("NewApi")
+	public boolean isBtConect() {
+		IS_NEED_REDIRECT = 0;
+		BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		IS_NEED_REDIRECT |= parseBtState(mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET));
+
+		Log.d(LOG_TAG, "IS_NEED_REDIRECT:" + IS_NEED_REDIRECT);
+		return (IS_NEED_REDIRECT & BIT_BT_CONNECTED) == BIT_BT_CONNECTED;
 	}
 
 	public static int parseBtState(int state) {
@@ -159,6 +171,8 @@ public class KeyService {
 	 * 设置休眠时间 毫秒
 	 */
 	public void setScreenOffTime(int paramInt) {
+		if(mContext != null)
+			Toast.makeText(mContext, "TestKey:将休眠时间设置为" + paramInt/1000 + "秒.", Toast.LENGTH_SHORT).show();
 		try {
 			Settings.System.putInt(mContext.getContentResolver(),
 					Settings.System.SCREEN_OFF_TIMEOUT, paramInt);

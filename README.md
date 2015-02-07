@@ -52,3 +52,10 @@ TestKey.apk目前只启动重定向的功能。
 下午：更新源码，解决逻辑错误，已经测试。
 
 ###20150205更 添加连接蓝牙后自动将黑屏时间设置为10秒
+
+###20150205更 添加连接蓝牙休眠时间设置为10秒断开设置为120秒
+并添加了通知，在Miui中验证过了。
+
+![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-105356.png "github")
+
+![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-105501.png "github") 
