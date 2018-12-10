@@ -1,12 +1,12 @@
 Android按键测试程序
 ---
-###物理按键测试
+### 物理按键测试
 正常安装启动后就可以检测
 
-###蓝牙耳机播放音乐相关按键测试
+### 蓝牙耳机播放音乐相关按键测试
 需要额外播放音乐才能监听
 
-###蓝牙耳机语音通话相关按键测试
+### 蓝牙耳机语音通话相关按键测试
 其中：
 
 		     VOICE_COMMAND : 语音拨号键
@@ -24,7 +24,7 @@ Android按键测试程序
 ![github](https://github.com/kangear/TestKey/blob/master/apk/last_number_redail.png "github")
 
 
-###20150122更
+### 20150122更
 介于国产手机ROM进行了CALL_PRIVILEGED进行了恶意屏蔽导致无法正常使用，所以只有通过更改Bluetooth.apk对「末号重拨」进行重定向。
 
 apk/目录下TestKey.apk/Bluetooth.apk是最新的。
@@ -35,7 +35,7 @@ apk/目录下TestKey.apk/Bluetooth.apk是最新的。
 
 如果实验正常，那么下一步就是转向到「语音拨号」。
 
-###20150123更 重定向
+### 20150123更 重定向
 1.不再监听VOICE_COMMAND且将LAST_NUMBER_REDIAL重定向到VOICE_COMMAND
 
 只更新了TestKey.apk只重新安装它就好。
@@ -46,14 +46,14 @@ TestKey.apk目前只启动重定向的功能。
 
 2.重定向后自行关闭
 
-###20150124更 选择性重定向
+### 20150124更 选择性重定向
 添加判断条件，当且仅当在BT连接／黑屏(锁屏)状态下进行重定向。
 
 下午：更新源码，解决逻辑错误，已经测试。
 
-###20150205更 添加连接蓝牙后自动将黑屏时间设置为10秒
+### 20150205更 添加连接蓝牙后自动将黑屏时间设置为10秒
 
-###20150207更 添加连接蓝牙休眠时间设置为10秒断开设置为120秒
+### 20150207更 添加连接蓝牙休眠时间设置为10秒断开设置为120秒
 并添加了通知，在Miui中验证过了。
 
 ![github](https://github.com/kangear/TestKey/blob/master/apk/device-2015-02-07-105356.png "github")
